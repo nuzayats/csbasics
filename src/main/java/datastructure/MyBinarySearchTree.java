@@ -1,5 +1,7 @@
 package datastructure;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Iterator;
 
 public class MyBinarySearchTree<K extends Comparable<? super K>, V> implements Iterable<MyBinarySearchTree.Entry<K, V>> {
@@ -56,6 +58,10 @@ public class MyBinarySearchTree<K extends Comparable<? super K>, V> implements I
         return queue.iterator();
     }
 
+    public Iterator<Entry<K, V>> depthFirstIterator() {
+        return new DepthFirstIterator<>(root);
+    }
+
     public static class Entry<K extends Comparable<? super K>, V> {
         K key;
         V value;
@@ -73,5 +79,44 @@ public class MyBinarySearchTree<K extends Comparable<? super K>, V> implements I
         Node<K, V> left;
         Node<K, V> right;
         Entry<K, V> entry;
+    }
+
+    private static class DepthFirstIterator<K extends Comparable<? super K>, V> implements Iterator<Entry<K, V>> {
+
+        private Deque<Node<K, V>> deque = new ArrayDeque<>();
+        private Node<K, V> next;
+
+        public DepthFirstIterator(Node<K, V> root) {
+            deque.push(root);
+            findNext();
+        }
+
+        private void findNext() {
+            if (deque.isEmpty()) {
+                next = null;
+                return;
+            }
+
+            next = deque.pop();
+
+            if (next.right != null) {
+                deque.push(next.right);
+            }
+            if (next.left != null) {
+                deque.push(next.left);
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        @Override
+        public Entry<K, V> next() {
+            Entry<K, V> entry = next.entry;
+            findNext();
+            return entry;
+        }
     }
 }
