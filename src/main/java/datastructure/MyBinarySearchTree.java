@@ -83,27 +83,70 @@ public class MyBinarySearchTree<K extends Comparable<? super K>, V> implements I
 
     private static class DepthFirstIterator<K extends Comparable<? super K>, V> implements Iterator<Entry<K, V>> {
 
-        private Deque<Node<K, V>> deque = new ArrayDeque<>();
+        private Deque<Node<K, V>> stack = new ArrayDeque<>();
         private Node<K, V> next;
 
         public DepthFirstIterator(Node<K, V> root) {
-            deque.push(root);
+            stack.push(root);
             findNext();
         }
 
         private void findNext() {
-            if (deque.isEmpty()) {
+            if (stack.isEmpty()) {
                 next = null;
                 return;
             }
 
-            next = deque.pop();
+            next = stack.pop();
 
             if (next.right != null) {
-                deque.push(next.right);
+                stack.push(next.right);
             }
             if (next.left != null) {
-                deque.push(next.left);
+                stack.push(next.left);
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        @Override
+        public Entry<K, V> next() {
+            Entry<K, V> entry = next.entry;
+            findNext();
+            return entry;
+        }
+    }
+
+    public Iterator<Entry<K, V>> breadthFirstIterator() {
+        return new BreadthFirstIterator<>(root);
+    }
+
+    private static class BreadthFirstIterator<K extends Comparable<? super K>, V> implements Iterator<Entry<K, V>> {
+
+        private Deque<Node<K, V>> queue = new ArrayDeque<>();
+        private Node<K, V> next;
+
+        public BreadthFirstIterator(Node<K, V> next) {
+            queue.offer(next);
+            findNext();
+        }
+
+        private void findNext() {
+            if (queue.isEmpty()) {
+                next = null;
+                return;
+            }
+
+            next = queue.poll();
+
+            if (next.left != null) {
+                queue.offer(next.left);
+            }
+            if (next.right != null) {
+                queue.offer(next.right);
             }
         }
 
